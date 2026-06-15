@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ClearMobi | ประเมินราคา</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .upload-box {
+            background: rgba(255,255,255,0.05); border: 1px dashed var(--glass-border);
+            border-radius: 10px; aspect-ratio: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted);
+            transition: background 0.2s; position: relative; overflow: hidden;
+        }
+        .upload-box:active { background: rgba(255,255,255,0.1); }
+        .upload-box.uploaded { border: 1px solid var(--accent-green); }
+        .upload-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; display: none; }
+        .upload-box.uploaded img { display: block; }
+        .upload-icon { font-size: 20px; margin-bottom: 5px; }
+        .upload-text { font-size: 9px; text-align: center; line-height: 1.2;}
+
+        .price-result {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+            border: 1px solid var(--accent-green); border-radius: 15px; padding: 20px;
+            text-align: center; margin-top: 20px; display: none;
+        }
+    </style>
+</head>
+<body class="theme-spirited">
+
+    <div class="top-nav">
+        <a href="index.html" style="position: absolute; left: 20px; text-decoration: none; color: inherit; font-size: 20px;">←</a>
+        <div class="logo-c" style="font-size: 18px;">AI ประเมินราคา</div>
+    </div>
+
+    <div class="container">
+        <div class="glass-card-light" style="margin-bottom: 20px; text-align: center;">
+            <p style="font-size: 13px; margin-bottom: 10px;">📸 อัปโหลดรูปรอบเครื่อง <span style="color:var(--accent-blue); font-weight:bold;">จำนวน 9 มุม</span></p>
+
+            <div class="upload-grid" id="uploadGrid">
+                <div class="upload-box" onclick="mockUpload(this)"><div class="upload-icon">📱</div><div class="upload-text">หน้าจอ</div><img src="images/phone1.png"></div>
+                <div class="upload-box" onclick="mockUpload(this)"><div class="upload-icon">🔙</div><div class="upload-text">หลังเครื่อง</div><img src="images/phone-14-back.png"></div>
+                <div class="upload-box" onclick="mockUpload(this)"><div class="upload-icon">🔝</div><div class="upload-text">ขอบบน</div><img src="images/phone1.png"></div>
+                <div class="upload-box" onclick="mockUpload(this)"><div class="upload-icon">⬇️</div><div class="upload-text">ขอบล่าง</div><img src="images/phone1.png"></div>
+                <div class="upload-box" onclick="mockUpload(this)"><div class="upload-text">ขอบซ้าย</div><img src="images/phone1.png"></div>
+                <div class="upload-box" onclick="mockUpload(this)"><div class="upload-text">ขอบขวา</div><img src="images/phone1.png"></div>
+                <div class="upload-box" onclick="mockUpload(this)"><div class="upload-text">เลนส์กล้อง</div><img src="images/phone1.png"></div>
+                <div class="upload-box" onclick="mockUpload(this)"><div class="upload-text">จอเปิดขาว</div><img src="images/phone1.png"></div>
+                <div class="upload-box" onclick="mockUpload(this)"><div class="upload-text">จอเปิดดำ</div><img src="images/phone1.png"></div>
+            </div>
+
+            <button class="btn-glow-blue" style="width: 100%;" onclick="evaluatePrice()" id="btnEval">🤖 ให้ AI ประเมินราคา</button>
+        </div>
+
+        <div class="price-result" id="priceResult">
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 5px;">ราคาประเมินคาดการณ์</p>
+            <h2 style="color: var(--accent-green); font-size: 28px; margin-bottom: 15px;">฿18,500</h2>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-glow-blue" style="flex: 1; font-size: 13px;" onclick="window.location.href='kyc_legal.html'">💰 ยืนยันขาย</button>
+                <button class="btn-glow-blue" style="flex: 1; font-size: 13px; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 4px 15px rgba(245,158,11,0.4);" onclick="window.location.href='trade-in.html'">🔄 นำไปเทิร์น</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- เมนูด้านล่าง 6 เมนู -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>หน้าแรก</a>
+        <a href="marketplace.html" class="nav-item"><span class="nav-icon">🛒</span>ซื้อ</a>
+        <a href="evaluate.html" class="nav-item active"><span class="nav-icon">🤝</span>ขาย</a>
+        <a href="trade-in.html" class="nav-item"><span class="nav-icon">🔄</span>เทิร์น</a>
+        <a href="tracking.html" class="nav-item"><span class="nav-icon">📍</span>สถานะ</a>
+        <a href="soldout.html" class="nav-item"><span class="nav-icon">🏆</span>เครดิต</a>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        let uploadCount = 0;
+        function mockUpload(el) {
+            if(!el.classList.contains('uploaded')) {
+                el.classList.add('uploaded');
+                uploadCount++;
+            }
+        }
+        function evaluatePrice() {
+            if(uploadCount < 9) {
+                alert('⚠️ กรุณาอัปโหลดรูปภาพให้ครบจำนวน 9 มุมก่อนครับ');
+                return;
+            }
+            ActionLock.lock('btnEval', 'AI กำลังวิเคราะห์...');
+            setTimeout(() => {
+                document.getElementById('priceResult').style.display = 'block';
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

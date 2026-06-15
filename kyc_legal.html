@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ClearMobi | ทำสัญญาขาย</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .kyc-box { background: rgba(255,255,255,0.05); border: 1px dashed var(--accent-blue); border-radius: 15px; padding: 30px 20px; text-align: center; cursor: pointer; margin-bottom: 20px; transition: 0.2s;}
+        .kyc-box:active { background: rgba(255,255,255,0.1); }
+        .sig-pad { width: 100%; height: 150px; background: #fff; border-radius: 10px; margin-bottom: 10px; border: 2px solid #ccc; touch-action: none; }
+    </style>
+</head>
+<body class="theme-spirited">
+
+    <div class="top-nav">
+        <a href="evaluate.html" style="position: absolute; left: 20px; text-decoration: none; color: inherit; font-size: 20px;">←</a>
+        <div class="logo-c" style="font-size: 18px;">ยืนยันตัวตน (e-KYC)</div>
+    </div>
+
+    <div class="container">
+        <div class="glass-card-light">
+            <h3 style="font-size: 15px; margin-bottom: 15px; color: #fff;">1. อัปโหลดบัตรประชาชน</h3>
+            <div class="kyc-box" onclick="alert('จำลองการเปิดกล้องถ่ายบัตรประชาชน')">
+                <div style="font-size: 40px; margin-bottom: 10px;">🪪</div>
+                <p style="font-size: 12px; color: var(--accent-blue);">แตะเพื่อถ่ายรูปหน้าบัตรประชาชน</p>
+                <p style="font-size: 10px; color: var(--text-muted); margin-top: 5px;">(ระบบจะใส่ลายน้ำให้โดยอัตโนมัติ)</p>
+            </div>
+
+            <h3 style="font-size: 15px; margin-bottom: 10px; color: #fff;">2. ลายเซ็นอิเล็กทรอนิกส์</h3>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">
+                ข้าพเจ้าขอยืนยันว่าอุปกรณ์นี้เป็นกรรมสิทธิ์ของข้าพเจ้าโดยชอบธรรม และได้อ่าน <a href="terms.html" style="color: var(--accent-blue);">เงื่อนไขการขาย</a> เรียบร้อยแล้ว
+            </p>
+            <div class="sig-pad" id="sigPad" onclick="alert('จำลองการวาดลายเซ็น (รอนำเข้าไลบรารี Signature Pad)')"></div>
+
+            <button class="btn-glow-blue" style="width: 100%; margin-top: 15px; background: linear-gradient(90deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16,185,129,0.4);" onclick="submitKyc()" id="btnSubmit">✅ ยืนยันข้อมูลและส่งให้แอดมิน</button>
+        </div>
+    </div>
+
+    <!-- เมนูด้านล่าง 6 เมนู -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>หน้าแรก</a>
+        <a href="marketplace.html" class="nav-item"><span class="nav-icon">🛒</span>ซื้อ</a>
+        <a href="evaluate.html" class="nav-item active"><span class="nav-icon">🤝</span>ขาย</a>
+        <a href="trade-in.html" class="nav-item"><span class="nav-icon">🔄</span>เทิร์น</a>
+        <a href="tracking.html" class="nav-item"><span class="nav-icon">📍</span>สถานะ</a>
+        <a href="soldout.html" class="nav-item"><span class="nav-icon">🏆</span>เครดิต</a>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        function submitKyc() {
+            ActionLock.lock('btnSubmit', 'กำลังเข้ารหัสข้อมูล...');
+            setTimeout(() => {
+                alert('🎉 ข้อมูลถูกส่งไปที่ Telegram ของแอดมินเรียบร้อยแล้ว แอดมินจะติดต่อกลับเพื่อนัดหมายรับเครื่องครับ!');
+
+                // บันทึกสถานะว่าเพิ่งทำรายการขาย
+                AppState.set('last_tx', 'sell');
+
+                window.location.href = 'tracking.html';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

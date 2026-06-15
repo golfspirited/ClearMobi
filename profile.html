@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ClearMobi | บัญชีผู้ใช้</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .profile-container { display: flex; flex-direction: column; align-items: center; flex: 1; padding-top: 30px;}
+        .prof-circle { background: #fff; border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; border: 4px solid var(--accent-blue); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); margin-bottom: 15px; overflow: hidden; }
+        .prof-circle img { width: 100%; height: 100%; object-fit: cover;}
+        .opt-list { display: flex; flex-direction: column; gap: 12px; margin-top: 35px; width: 100%; }
+        .opt-item {
+            background: rgba(255,255,255,0.8); border: 1px solid var(--glass-border);
+            border-radius: 15px; padding: 18px 20px;
+            display: flex; flex-direction: row; align-items: center; gap: 15px;
+            cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .opt-item:active { background: rgba(230,230,230,0.8); }
+        .opt-icon { font-size: 24px; display: flex; align-items: center; justify-content: center; width: 35px; height: 35px; background: rgba(59, 130, 246, 0.1); border-radius: 10px;}
+        .opt-text { font-size: 15px; color: #1e293b; font-weight: bold; flex: 1; text-align: left;}
+        .opt-arrow { color: #94a3b8; font-weight: bold; font-size: 16px;}
+    </style>
+</head>
+<body class="theme-pastel">
+
+    <div class="top-nav">
+        <a href="index.html" style="position: absolute; left: 20px; font-size: 20px; text-decoration: none; color: inherit;">←</a>
+        <div class="logo-c" style="font-size: 18px;">บัญชีผู้ใช้</div>
+    </div>
+
+    <div class="container profile-container">
+        <div class="prof-circle"><img src="images/goodduck.png" alt="Duck"></div>
+        <p style="font-size: 12px; color: var(--text-muted);">สถานะยืนยันตัวตนสำเร็จ</p>
+        <p style="font-size: 22px; font-weight: bold; color: #1e293b;">081-xxx-xxxx</p>
+
+        <div class="opt-list">
+            <div class="opt-item" id="themeBtn">
+                <div class="opt-icon">🌓</div>
+                <div class="opt-text" id="themeText">เปลี่ยนธีมหน้าจอ</div>
+                <div class="opt-arrow">❯</div>
+            </div>
+
+            <div class="opt-item" onclick="AppState.clearAll(); alert('✅ ล้างข้อมูลประวัติและแคชสำเร็จ'); window.location.href='index.html';">
+                <div class="opt-icon" style="background: rgba(239, 68, 68, 0.1);">🗑️</div>
+                <div class="opt-text">ล้างประวัติการทำรายการ</div>
+                <div class="opt-arrow">❯</div>
+            </div>
+
+            <div class="opt-item" onclick="alert('👉 กำลังเปิดแชท Telegram แอดมิน');">
+                <div class="opt-icon" style="background: rgba(16, 185, 129, 0.1);">💬</div>
+                <div class="opt-text">ติดต่อผู้ดูแลระบบ</div>
+                <div class="opt-arrow">❯</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- เมนูด้านล่าง 6 เมนู -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>หน้าแรก</a>
+        <a href="marketplace.html" class="nav-item"><span class="nav-icon">🛒</span>ซื้อ</a>
+        <a href="evaluate.html" class="nav-item"><span class="nav-icon">🤝</span>ขาย</a>
+        <a href="trade-in.html" class="nav-item"><span class="nav-icon">🔄</span>เทิร์น</a>
+        <a href="tracking.html" class="nav-item"><span class="nav-icon">📍</span>สถานะ</a>
+        <a href="soldout.html" class="nav-item"><span class="nav-icon">🏆</span>เครดิต</a>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeBtn = document.getElementById('themeBtn');
+            themeBtn.addEventListener('click', () => {
+                if (document.body.classList.contains('theme-spirited')) {
+                    document.body.classList.remove('theme-spirited');
+                    document.body.classList.add('theme-pastel');
+                    AppState.set('theme', 'pastel');
+                } else {
+                    document.body.classList.remove('theme-pastel');
+                    document.body.classList.add('theme-spirited');
+                    AppState.set('theme', 'spirited');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

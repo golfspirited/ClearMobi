@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ClearMobi | ติดตามสถานะ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .search-box { width: 100%; padding: 15px; border-radius: 15px; border: none; background: rgba(255,255,255,0.9); color: #1e293b; font-size: 16px; text-align: center; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; outline: none; }
+        .timeline { position: relative; margin: 20px auto; padding-left: 20px; }
+        .timeline::before { content: ''; position: absolute; top: 0; left: 0; height: 100%; width: 3px; background: rgba(0,0,0,0.1); border-radius: 5px; }
+        .timeline-item { position: relative; margin-bottom: 25px; padding-left: 20px; }
+        .timeline-item::before { content: ''; position: absolute; top: 3px; left: -26px; width: 20px; height: 20px; border-radius: 50%; background: #cbd5e1; border: 3px solid #fff; z-index: 2; transition: all 0.3s;}
+        .timeline-item.done::before { background: var(--accent-green); }
+        .timeline-item.active::before { background: var(--accent-blue); box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.3); animation: pulse 2s infinite; }
+        .timeline-title { font-weight: bold; font-size: 14px; color: #1e293b; margin-bottom: 2px; }
+        .timeline-desc { font-size: 11px; color: #64748b; line-height: 1.4; }
+        .role-view { display: none; }
+        .role-view.show { display: block; animation: fadeInUp 0.5s ease; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="theme-pastel">
+
+    <div class="top-nav">
+        <a href="index.html" style="position: absolute; left: 20px; text-decoration: none; color: inherit; font-size: 20px;">←</a>
+        <div class="logo-c" style="font-size: 18px;">ตรวจสอบสถานะ</div>
+    </div>
+
+    <div class="container">
+        <div class="glass-card-light" id="searchSection">
+            <h3 style="text-align: center; color: #1e293b; margin-bottom: 15px;">สถานะการ ซื้อ/ขาย/เทิร์น</h3>
+            <input type="tel" id="trackInput" class="search-box" placeholder="📱 เบอร์โทรศัพท์ 10 หลัก" maxlength="10">
+            <button class="btn-glow-blue" id="searchBtn">🔍 ค้นหาข้อมูล (OTP)</button>
+        </div>
+
+        <div class="glass-card-light role-view" id="statusView">
+            <div style="background: #fff; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div style="font-size: 11px; color: #64748b;">เบอร์โทรศัพท์</div>
+                <div style="font-size: 18px; font-weight: bold; color: var(--accent-blue);" id="userPhoneDisplay">-</div>
+            </div>
+            <div class="timeline" id="timelineContainer"></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>หน้าแรก</a>
+        <a href="marketplace.html" class="nav-item"><span class="nav-icon">🛒</span>ซื้อ</a>
+        <a href="evaluate.html" class="nav-item"><span class="nav-icon">🤝</span>ขาย</a>
+        <a href="trade-in.html" class="nav-item"><span class="nav-icon">🔄</span>เทิร์น</a>
+        <a href="tracking.html" class="nav-item active"><span class="nav-icon">📍</span>สถานะ</a>
+        <a href="soldout.html" class="nav-item"><span class="nav-icon">🏆</span>เครดิต</a>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.getElementById('searchBtn').addEventListener('click', function() {
+            const phone = document.getElementById('trackInput').value;
+            if(phone.length < 10) { alert('กรุณากรอกเบอร์โทรศัพท์ 10 หลักครับ'); return; }
+
+            ActionLock.lock('searchBtn', 'เชื่อมต่อระบบ...');
+            setTimeout(() => {
+                ActionLock.unlock('searchBtn');
+                document.getElementById('searchSection').style.display = 'none';
+                document.getElementById('statusView').classList.add('show');
+                document.getElementById('userPhoneDisplay').innerText = phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+
+                const timeline = document.getElementById('timelineContainer');
+                const lastTx = AppState.get('last_tx');
+                const questStep = parseInt(AppState.get('quest_step') || '0');
+
+                if (lastTx === 'sell') {
+                    timeline.innerHTML = `<div class="timeline-item done"><div class="timeline-title">1. ทำสัญญา (KYC)</div><div class="timeline-desc">แอดมินรับทราบแล้ว</div></div><div class="timeline-item active"><div class="timeline-title">2. นัดรับเครื่อง</div><div class="timeline-desc">รอแอดมินติดต่อทาง Telegram</div></div>`;
+                } else if (lastTx === 'trade') {
+                    timeline.innerHTML = `<div class="timeline-item done"><div class="timeline-title">1. แจ้งเทิร์นเครื่อง</div><div class="timeline-desc">ระบบบันทึกส่วนต่างแล้ว</div></div><div class="timeline-item active"><div class="timeline-title">2. นัดหมายและทำสัญญา</div><div class="timeline-desc">รอแอดมินติดต่อทาง Telegram</div></div>`;
+                } else if (lastTx === 'buy' && questStep === 0) {
+                    timeline.innerHTML = `<div class="timeline-item done"><div class="timeline-title">1. ยืนยันคำสั่งซื้อ</div><div class="timeline-desc">แอดมินรับออเดอร์แล้ว</div></div><div class="timeline-item active"><div class="timeline-title">2. จัดส่งสินค้า</div><div class="timeline-desc">รอรับพัสดุและชำระเงินปลายทาง</div><button class="btn-glow-blue" style="margin-top: 8px; font-size: 11px; padding: 8px 12px; width: auto;" onclick="receiveItem()">📦 ได้รับเครื่องแล้ว (เริ่มภารกิจ)</button></div>`;
+                } else if (questStep > 0 && questStep < 7) {
+                    timeline.innerHTML = `<div class="timeline-item done"><div class="timeline-title">1. รับเครื่องสำเร็จ</div><div class="timeline-desc">เริ่มทำภารกิจแล้ว</div></div><div class="timeline-item active"><div class="timeline-title">2. ภารกิจ 28 วัน</div><div class="timeline-desc">ทำไปแล้ว ${questStep}/6 ด่าน</div><button class="btn-glow-blue" style="margin-top: 8px; font-size: 11px; padding: 6px 12px; width: auto;" onclick="window.location.href='quest.html'">🚀 ทำภารกิจต่อ</button></div>`;
+                } else if (questStep === 7) {
+                    timeline.innerHTML = `<div class="timeline-item done"><div class="timeline-title">1. ภารกิจ 28 วัน</div><div class="timeline-desc">สำเร็จครบ 6 ด่าน</div></div><div class="timeline-item done"><div class="timeline-title">2. ตรวจสอบสลิป</div><div class="timeline-desc">แอดมินตรวจสอบแล้ว</div></div><div class="timeline-item active"><div class="timeline-title">3. จัดส่งโล่รางวัล</div><div class="timeline-desc">ระบบกำลังส่งโล่เข้า Email 🛡️</div></div>`;
+                } else {
+                    timeline.innerHTML = `<div style="text-align: center; color: #64748b; padding: 10px;"><img src="images/goodduck.png" style="width: 100px; margin-bottom: 10px;"><br>ไม่พบประวัติการทำรายการ<br><br><button class="btn-glow-green" onclick="window.location.href='index.html'">หน้าแรก</button></div>`;
+                }
+            }, 1000);
+        });
+
+        window.receiveItem = function() {
+            alert("🎉 ยืนยันรับเครื่องสำเร็จ! เริ่มทำภารกิจรับประกัน 28 วันได้เลยครับ");
+            AppState.set('quest_step', '1');
+            window.location.href = 'quest.html';
+        }
+    </script>
+</body>
+</html>

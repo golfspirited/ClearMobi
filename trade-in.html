@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ClearMobi | แลกเครื่องใหม่</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .calc-wrapper { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 10px; }
+        .calc-card { width: 100%; text-align: center; padding: 15px;}
+        .price-input { font-size: 24px; font-weight: bold; color: #1a202c; border: none; background: transparent; text-align: center; width: 100%; outline: none; }
+        .op-circle { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.5)); border: 2px solid #fff; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: var(--accent-blue); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); margin: -5px 0; z-index: 10; }
+        .phone-thumb { width: 80px; height: 80px; object-fit: contain; margin: 10px 0; }
+        .phone-selector { background: rgba(255,255,255,0.7); border: 1px solid var(--glass-border); border-radius: 12px; padding: 10px; width: 100%; font-family: inherit; font-size: 13px; color: #333; outline: none; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body class="theme-pastel">
+
+    <div class="top-nav">
+        <a href="evaluate.html" style="position: absolute; left: 20px; font-size: 20px; text-decoration: none; color: inherit;">←</a>
+        <div class="logo-c" style="font-size: 18px;">คำนวณเทิร์นเครื่อง</div>
+    </div>
+
+    <div class="container">
+        <div class="calc-wrapper">
+            <div class="glass-card-light calc-card">
+                <p style="font-size: 12px; color: var(--text-muted);">1. เครื่องเก่าของคุณ (ราคาประเมิน AI)</p>
+                <img src="images/phone-14-blue.png" class="phone-thumb" alt="Old Phone">
+                <p class="price-input" style="color: var(--accent-green);">฿<span id="oldPhonePriceDisplay">18,500</span></p>
+            </div>
+
+            <div class="op-circle">-</div>
+
+            <div class="glass-card-light calc-card">
+                <p style="font-size: 12px; color: var(--text-muted);">2. เครื่องใหม่ที่ต้องการเทิร์น</p>
+                <img src="images/phone2.png" class="phone-thumb" alt="New Phone">
+                <select class="phone-selector" id="newPhoneSelect">
+                    <option value="23000" selected>iPhone 13 Pro Max - ฿23,000</option>
+                    <option value="28000">Galaxy S23 Ultra - ฿28,000</option>
+                </select>
+            </div>
+
+            <div class="glass-card-light" style="width: 100%; text-align: center; border: 2px dashed var(--accent-blue);">
+                <p style="font-size: 12px; color: var(--text-muted);">💰 สรุปยอดส่วนต่าง</p>
+                <p style="font-size: 28px; font-weight: bold; color: var(--accent-blue); margin: 5px 0;" id="diffPriceDisplay">฿4,500</p>
+            </div>
+
+            <button class="btn-glow-blue" id="confirmTradeBtn" style="margin-top: 5px;">🤝 ยืนยันการเทิร์น แจ้ง Telegram</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>หน้าแรก</a>
+        <a href="marketplace.html" class="nav-item"><span class="nav-icon">🛒</span>ซื้อ</a>
+        <a href="evaluate.html" class="nav-item"><span class="nav-icon">🤝</span>ขาย</a>
+        <a href="trade-in.html" class="nav-item active"><span class="nav-icon">🔄</span>เทิร์น</a>
+        <a href="tracking.html" class="nav-item"><span class="nav-icon">📍</span>สถานะ</a>
+        <a href="soldout.html" class="nav-item"><span class="nav-icon">🏆</span>เครดิต</a>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const oldPrice = parseInt(AppState.get('eval_price') || '18500');
+            document.getElementById('oldPhonePriceDisplay').innerText = oldPrice.toLocaleString();
+            const newPhoneSelect = document.getElementById('newPhoneSelect'), diffPriceDisplay = document.getElementById('diffPriceDisplay');
+
+            function calc() {
+                const diff = parseInt(newPhoneSelect.value) - oldPrice;
+                if (diff < 0) { diffPriceDisplay.style.color = 'var(--accent-green)'; diffPriceDisplay.innerText = "เราทอน: ฿" + Math.abs(diff).toLocaleString(); }
+                else { diffPriceDisplay.innerText = "จ่ายเพิ่ม: ฿" + diff.toLocaleString(); diffPriceDisplay.style.color = 'var(--accent-blue)'; }
+            }
+            calc(); newPhoneSelect.addEventListener('change', calc);
+
+            document.getElementById('confirmTradeBtn').addEventListener('click', () => {
+                ActionLock.lock('confirmTradeBtn', 'แจ้งแอดมิน...');
+                setTimeout(() => { alert('🎉 ส่งเรื่องสำเร็จ! แอดมินจะติดต่อกลับทาง Telegram เพื่อยืนยันและนัดรับเครื่องครับ'); AppState.clearAll(); AppState.set('last_tx', 'trade'); window.location.href = 'tracking.html'; }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>

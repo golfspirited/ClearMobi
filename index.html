@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ClearMobi | หน้าแรก</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .doc-group { margin-bottom: 25px; }
+        .doc-group h3 { font-size: 14px; color: var(--accent-blue); margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;}
+
+        /* ปรับเป็นคอลัมน์เดียว (List View) ให้กดง่ายๆ บนมือถือ */
+        .doc-list { display: flex; flex-direction: column; gap: 10px; }
+        .doc-card {
+            background: var(--glass-dark); border: 1px solid var(--glass-border);
+            border-radius: 15px; padding: 12px 15px; display: flex; align-items: center; gap: 15px; cursor: pointer;
+            transition: transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .doc-card:active { transform: scale(0.97); }
+        .doc-icon { font-size: 24px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); width: 35px; text-align: center;}
+        .doc-name { font-size: 12px; color: #fff; font-weight: bold; flex: 1; }
+        .doc-arrow { color: var(--text-muted); font-size: 14px; }
+    </style>
+</head>
+<body class="theme-spirited">
+
+    <div class="top-nav">
+        <div class="logo-c">CLEARMOBI</div>
+        <div style="position: absolute; right: 20px; width: 30px; height: 30px; border-radius: 50%; overflow: hidden; border: 2px solid var(--accent-blue); cursor: pointer;" onclick="window.location.href='profile.html'">
+            <img src="images/goodduck.png" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+    </div>
+
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="font-size: 20px; color: #fff; line-height: 1.3;">เอกสารรับรองบริษัท</h1>
+            <p style="font-size: 11px; color: var(--accent-green);">แตะที่รายการเพื่อซูมดูเอกสารฉบับเต็ม</p>
+        </div>
+
+        <div class="doc-group">
+            <h3>⚖️ กฎหมาย & สถานประกอบการ</h3>
+            <div class="doc-list">
+                <div class="doc-card" onclick="openDocument('images/doc-crc.png')">
+                    <div class="doc-icon">📜</div><div class="doc-name">ทะเบียนพาณิชย์อิเล็กทรอนิกส์</div><div class="doc-arrow">🔍</div>
+                </div>
+                <div class="doc-card" onclick="openDocument('images/doc-dbd.png')">
+                    <div class="doc-icon">🏢</div><div class="doc-name">เครื่องหมาย DBD Registered</div><div class="doc-arrow">🔍</div>
+                </div>
+                <div class="doc-card" onclick="openDocument('images/doc-sop.png')">
+                    <div class="doc-icon">⚖️</div><div class="doc-name">ใบอนุญาตค้าของเก่า</div><div class="doc-arrow">🔍</div>
+                </div>
+                <div class="doc-card" onclick="openDocument('images/doc-ocpb.png')">
+                    <div class="doc-icon">🛒</div><div class="doc-name">ทะเบียนตลาดแบบตรง (สคบ.)</div><div class="doc-arrow">🔍</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="doc-group">
+            <h3>🗂️ บัญชี & การจัดซื้อ</h3>
+            <div class="doc-list">
+                <div class="doc-card" onclick="openDocument('images/doc-voucher.png')">
+                    <div class="doc-icon">💸</div><div class="doc-name">ตัวอย่างใบสำคัญจ่าย</div><div class="doc-arrow">🔍</div>
+                </div>
+                <div class="doc-card" onclick="openDocument('images/doc-ekyc.png')">
+                    <div class="doc-icon">🪪</div><div class="doc-name">ตัวอย่าง e-KYC ผู้ขาย</div><div class="doc-arrow">🔍</div>
+                </div>
+                <div class="doc-card" onclick="openDocument('images/doc-agreement.png')">
+                    <div class="doc-icon">🤝</div><div class="doc-name">สัญญาซื้อขายและรับรองสิทธิ์</div><div class="doc-arrow">🔍</div>
+                </div>
+                <div class="doc-card" onclick="openDocument('images/doc-ledger.png')">
+                    <div class="doc-icon">📓</div><div class="doc-name">สมุดบัญชี ค.ก. 2 (อิเล็กทรอนิกส์)</div><div class="doc-arrow">🔍</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="doc-group">
+            <h3>📊 ภาษีอากร (Tax)</h3>
+            <div class="doc-list">
+                <div class="doc-card" onclick="openDocument('images/doc-pp20.png')">
+                    <div class="doc-icon">📄</div><div class="doc-name">ใบทะเบียนภาษีมูลค่าเพิ่ม (ภ.พ. 20)</div><div class="doc-arrow">🔍</div>
+                </div>
+                <div class="doc-card" onclick="openDocument('images/doc-etax.png')">
+                    <div class="doc-icon">🧾</div><div class="doc-name">ใบกำกับภาษีอิเล็กทรอนิกส์ (e-Tax)</div><div class="doc-arrow">🔍</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="doc-group">
+            <h3>🤝 ลูกค้าสัมพันธ์</h3>
+            <div class="doc-list">
+                <div class="doc-card" onclick="window.location.href='terms.html'">
+                    <div class="doc-icon">📌</div><div class="doc-name">เงื่อนไขการให้บริการ (T&C)</div><div class="doc-arrow">❯</div>
+                </div>
+                <div class="doc-card" onclick="window.location.href='terms.html'">
+                    <div class="doc-icon">🔐</div><div class="doc-name">นโยบายความเป็นส่วนตัว (Privacy)</div><div class="doc-arrow">❯</div>
+                </div>
+                <div class="doc-card" onclick="openDocument('images/doc-diagnostic.png')">
+                    <div class="doc-icon">✅</div><div class="doc-name">ใบรับรองการตรวจคุณภาพ</div><div class="doc-arrow">🔍</div>
+                </div>
+                <div class="doc-card" onclick="openDocument('images/shield-28days.png')">
+                    <div class="doc-icon">🛡️</div><div class="doc-name">ตัวอย่างใบรับประกัน 7/28 วัน</div><div class="doc-arrow">🔍</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item active"><span class="nav-icon">🏠</span>หน้าแรก</a>
+        <a href="marketplace.html" class="nav-item"><span class="nav-icon">🛒</span>ซื้อ</a>
+        <a href="evaluate.html" class="nav-item"><span class="nav-icon">🤝</span>ขาย</a>
+        <a href="trade-in.html" class="nav-item"><span class="nav-icon">🔄</span>เทิร์น</a>
+        <a href="tracking.html" class="nav-item"><span class="nav-icon">📍</span>สถานะ</a>
+        <a href="soldout.html" class="nav-item"><span class="nav-icon">🏆</span>เครดิต</a>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

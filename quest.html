@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ClearMobi | ภารกิจรับประกัน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .quest-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .quest-item { background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .quest-item.locked { opacity: 0.5; pointer-events: none; }
+        .quest-item.active { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 10px rgba(59,130,246,0.2);}
+        .quest-item.done { border-color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+        .status-badge { font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: bold; }
+        .status-locked { background: #cbd5e1; color: #475569; }
+        .status-active { background: var(--accent-blue); color: #fff; }
+        .status-done { background: var(--accent-green); color: #fff; }
+        .upload-area { border: 2px dashed var(--accent-blue); padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; margin-top: 15px; background: rgba(255,255,255,0.8); }
+        .shield-img { width: 120px; height: auto; display: block; margin: 0 auto 15px auto; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); }
+    </style>
+</head>
+<body class="theme-pastel">
+
+    <div class="top-nav">
+        <a href="tracking.html" style="position: absolute; left: 20px; font-size: 20px; text-decoration: none; color: inherit;">←</a>
+        <div class="logo-c" style="font-size: 18px;">ภารกิจ 28 วัน</div>
+    </div>
+
+    <div class="container">
+        <div class="glass-card-light" id="questContainer">
+            <img src="images/shield-28days.png" class="shield-img" alt="Shield">
+            <h3 style="margin-bottom: 15px; text-align: center; color: #1e293b;">ทำเควสเพื่อรับโล่ 28 วัน</h3>
+            <div class="quest-list" id="questList"></div>
+            <input type="file" id="questUploadInput" accept="image/*" style="display: none;">
+            <div id="uploadSection" class="upload-area" style="display: none;">
+                <div style="font-size: 28px; margin-bottom: 5px;">📸</div>
+                <div id="uploadTitle" style="font-weight: bold; color: var(--accent-blue); font-size: 14px;">แตะเพื่อส่งหลักฐาน</div>
+            </div>
+            <div id="paymentSection" style="display: none; text-align: center; padding: 10px;">
+                <h4 style="color: var(--accent-green); margin-bottom: 10px; font-size: 18px;">🎉 ภารกิจแชร์สำเร็จ</h4>
+                <div style="font-size: 28px; font-weight: bold; color: var(--accent-blue); margin-bottom: 15px;">โอน 100 บาท</div>
+                <button class="btn-glow-blue" id="slipBtn">📥 อัปโหลดสลิป 100 บาท</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- เมนูด้านล่าง 6 เมนู -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>หน้าแรก</a>
+        <a href="marketplace.html" class="nav-item"><span class="nav-icon">🛒</span>ซื้อ</a>
+        <a href="evaluate.html" class="nav-item"><span class="nav-icon">🤝</span>ขาย</a>
+        <a href="trade-in.html" class="nav-item"><span class="nav-icon">🔄</span>เทิร์น</a>
+        <a href="tracking.html" class="nav-item active"><span class="nav-icon">📍</span>สถานะ</a>
+        <a href="soldout.html" class="nav-item"><span class="nav-icon">🏆</span>เครดิต</a>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const quests = ["แชร์ Facebook", "แชร์ TikTok", "แชร์กลุ่มบ้าน", "แชร์ที่ทำงาน", "แชร์ทั่วไป", "แชร์กลุ่มร่มเกล้า"];
+        let currentQuest = parseInt(AppState.get('quest_step') || '1') - 1; if (currentQuest < 0) currentQuest = 0;
+        const list = document.getElementById('questList'), uploadSec = document.getElementById('uploadSection'), paySec = document.getElementById('paymentSection'), uploadTitle = document.getElementById('uploadTitle'), uploadInput = document.getElementById('questUploadInput'), slipBtn = document.getElementById('slipBtn');
+
+        function renderQuests() {
+            list.innerHTML = '';
+            if (currentQuest >= 6) { list.style.display = 'none'; uploadSec.style.display = 'none'; paySec.style.display = 'block'; return; }
+            quests.forEach((q, idx) => {
+                let statusClass = 'locked', badgeClass = 'status-locked', badgeText = '🔒 ล็อก';
+                if (idx < currentQuest) { statusClass = 'done'; badgeClass = 'status-done'; badgeText = '✅ ผ่าน'; }
+                else if (idx === currentQuest) { statusClass = 'active'; badgeClass = 'status-active'; badgeText = 'รอรูป'; uploadTitle.innerText = `ส่งหลักฐาน: ${q}`; uploadSec.style.display = 'block'; }
+                list.innerHTML += `<div class="quest-item ${statusClass}"><div><div style="font-weight: bold; font-size: 14px; color: #1e293b;">ด่านที่ ${idx + 1}</div><div style="font-size: 11px; color: #64748b;">${q}</div></div><div class="status-badge ${badgeClass}">${badgeText}</div></div>`;
+            });
+        }
+
+        uploadSec.addEventListener('click', () => uploadInput.click());
+        uploadInput.addEventListener('change', function(e) {
+            if (e.target.files[0]) {
+                uploadTitle.innerText = '⏳ อัปโหลด...';
+                ImageOptimizer.compress(e.target.files[0], 0.6, 800).then(() => { currentQuest++; AppState.set('quest_step', currentQuest + 1); renderQuests(); uploadInput.value = ''; });
+            }
+        });
+
+        slipBtn.addEventListener('click', () => {
+            uploadInput.click();
+            uploadInput.onchange = (e) => {
+                if(e.target.files[0]){
+                    ActionLock.lock('slipBtn', 'แจ้ง Telegram...');
+                    setTimeout(() => { alert('🎉 ยิงสลิปเข้า Telegram สำเร็จ'); AppState.set('quest_step', 7); window.location.href = 'tracking.html'; }, 1500);
+                }
+            };
+        });
+        renderQuests();
+    </script>
+</body>
+</html>

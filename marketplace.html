@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>ClearMobi | ตลาดมือถือ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; justify-content: flex-start; overflow-x: auto; padding-bottom: 5px; }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--glass-border); padding: 8px 18px; border-radius: 20px; font-size: 12px; cursor: pointer; flex-shrink: 0;}
+        .filter-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); font-weight: bold; }
+
+        /* List View (คอลัมน์เดียว) */
+        .product-list { display: flex; flex-direction: column; gap: 15px; }
+        .product-card {
+            display: flex; flex-direction: row; align-items: center; gap: 15px;
+            padding: 15px; cursor: pointer; background: var(--glass-dark);
+            border-radius: 20px; border: 1px solid var(--glass-border);
+        }
+        .prod-img-wrapper { width: 90px; height: 90px; flex-shrink: 0; background: rgba(255,255,255,0.05); border-radius: 15px; display: flex; justify-content: center; align-items: center; }
+        .prod-img { width: 80%; height: 80%; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); transition: transform 0.3s; }
+        .product-card:active .prod-img { transform: scale(1.1); }
+
+        .prod-info { flex: 1; text-align: left; display: flex; flex-direction: column; justify-content: center; }
+        .prod-title { font-size: 15px; color: #fff; font-weight: bold; margin-bottom: 2px; line-height: 1.2; }
+        .prod-cond { font-size: 11px; color: var(--accent-green); margin-bottom: 5px; }
+        .prod-price { font-size: 18px; font-weight: bold; color: #60a5fa; margin-bottom: 8px; }
+
+        .btn-buy-sm { background: linear-gradient(90deg, #1e3a8a, #3b82f6); border: none; color: white; padding: 8px 20px; border-radius: 12px; font-weight: bold; font-size: 12px; align-self: flex-start;}
+    </style>
+</head>
+<body class="theme-spirited">
+
+    <div class="top-nav">
+        <a href="index.html" style="position: absolute; left: 20px; font-size: 20px; text-decoration: none; color: inherit;">←</a>
+        <div class="logo-c" style="font-size: 18px;">ตลาดมือถือ</div>
+    </div>
+
+    <div class="container">
+        <div class="filter-bar">
+            <div class="filter-btn active">🌟 ทั้งหมด</div>
+            <div class="filter-btn">🍎 iPhone</div>
+            <div class="filter-btn">🤖 Galaxy</div>
+            <div class="filter-btn">✨ เกรดนางฟ้า</div>
+        </div>
+
+        <div class="product-list" id="productGrid">
+
+            <div class="product-card">
+                <div class="prod-img-wrapper" onclick="window.location.href='product.html'"><img src="images/phone1.png" class="prod-img" alt="Product"></div>
+                <div class="prod-info">
+                    <div class="prod-title">iPhone 13 Pro Max</div>
+                    <div class="prod-cond">✨ เกรด S (100%)</div>
+                    <div class="prod-price">฿23,000</div>
+                    <button class="btn-buy-sm" id="prod1BuyBtn" onclick="ActionLock.lock(this.id, 'จอง...'); setTimeout(()=>alert('🎉 จองสินค้าสำเร็จ แอดมินทัก Telegram แล้วครับ'), 800);">🛍️ สั่งซื้อ</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="prod-img-wrapper" onclick="window.location.href='product.html'"><img src="images/phone2.png" class="prod-img" alt="Product"></div>
+                <div class="prod-info">
+                    <div class="prod-title">Galaxy S23 Ultra</div>
+                    <div class="prod-cond">✅ เกรด A (95%+)</div>
+                    <div class="prod-price">฿28,000</div>
+                    <button class="btn-buy-sm" id="prod2BuyBtn" onclick="ActionLock.lock(this.id, 'จอง...'); setTimeout(()=>alert('🎉 จองสินค้าสำเร็จ แอดมินทัก Telegram แล้วครับ'), 800);">🛍️ สั่งซื้อ</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="prod-img-wrapper" onclick="window.location.href='product.html'"><img src="images/phone-14-blue.png" class="prod-img" alt="Product"></div>
+                <div class="prod-info">
+                    <div class="prod-title">iPhone 14 (128GB)</div>
+                    <div class="prod-cond">✅ เกรด A (95%+)</div>
+                    <div class="prod-price">฿18,500</div>
+                    <button class="btn-buy-sm" id="prod3BuyBtn" onclick="ActionLock.lock(this.id, 'จอง...'); setTimeout(()=>alert('🎉 จองสินค้าสำเร็จ แอดมินทัก Telegram แล้วครับ'), 800);">🛍️ สั่งซื้อ</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>หน้าแรก</a>
+        <a href="marketplace.html" class="nav-item active"><span class="nav-icon">🛒</span>ซื้อ</a>
+        <a href="evaluate.html" class="nav-item"><span class="nav-icon">🤝</span>ขาย</a>
+        <a href="trade-in.html" class="nav-item"><span class="nav-icon">🔄</span>เทิร์น</a>
+        <a href="tracking.html" class="nav-item"><span class="nav-icon">📍</span>สถานะ</a>
+        <a href="soldout.html" class="nav-item"><span class="nav-icon">🏆</span>เครดิต</a>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
