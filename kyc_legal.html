@@ -32,10 +32,75 @@
             <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">
                 ข้าพเจ้าขอยืนยันว่าอุปกรณ์นี้เป็นกรรมสิทธิ์ของข้าพเจ้าโดยชอบธรรม และได้อ่าน <a href="terms.html" style="color: var(--accent-blue);">เงื่อนไขการขาย</a> เรียบร้อยแล้ว
             </p>
-            <div class="sig-pad" id="sigPad" onclick="alert('จำลองการวาดลายเซ็น (รอนำเข้าไลบรารี Signature Pad)')"></div>
+            <div style="position: relative;">
+    <canvas id="sigCanvas" class="sig-pad" width="400" height="150" style="touch-action: none; background: #fff;"></canvas>
+    <button onclick="clearSignature()" style="position: absolute; top: 10px; right: 10px; font-size: 10px; padding: 4px 8px; border-radius: 5px; border: 1px solid #ccc; background: #f8f9fa;">ล้างลายเซ็น</button>
+</div>
 
-            <button class="btn-glow-blue" style="width: 100%; margin-top: 15px; background: linear-gradient(90deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16,185,129,0.4);" onclick="submitKyc()" id="btnSubmit">✅ ยืนยันข้อมูลและส่งให้แอดมิน</button>
-        </div>
+<script>
+    const canvas = document.getElementById('sigCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    // ปรับขนาด Canvas ให้พอดีกับหน้าจอ
+    function resizeCanvas() {
+        canvas.width = canvas.parentElement.clientWidth;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // ตั้งค่าเส้นปากกา
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#0f172a';
+
+    // ฟังก์ชันเริ่มวาด
+    function startDrawing(e) {
+        isDrawing = true;
+        draw(e);
+    }
+
+    // ฟังก์ชันหยุดวาด
+    function stopDrawing() {
+        isDrawing = false;
+        ctx.beginPath();
+    }
+
+    // ฟังก์ชันวาดเส้น
+    function draw(e) {
+        if (!isDrawing) return;
+        e.preventDefault();
+
+        // รองรับทั้งเมาส์และนิ้วทัชสกรีน
+        let clientX = e.clientX || e.touches[0].clientX;
+        let clientY = e.clientY || e.touches[0].clientY;
+
+        let rect = canvas.getBoundingClientRect();
+        let x = clientX - rect.left;
+        let y = clientY - rect.top;
+
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    // ล้างลายเซ็น
+    function clearSignature() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+    }
+
+    // ผูก Event Listeners
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    canvas.addEventListener('touchstart', startDrawing, {passive: false});
+    canvas.addEventListener('touchmove', draw, {passive: false});
+    canvas.addEventListener('touchend', stopDrawing);
+</script>
     </div>
 
     <!-- เมนูด้านล่าง 6 เมนู -->
