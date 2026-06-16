@@ -3,126 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ClearMobi | ทำสัญญาขาย</title>
+    <title>ClearMobi | ยืนยันตัวตน (e-KYC)</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .kyc-box { background: rgba(255,255,255,0.05); border: 1px dashed var(--accent-blue); border-radius: 15px; padding: 30px 20px; text-align: center; cursor: pointer; margin-bottom: 20px; transition: 0.2s;}
+        .kyc-box {
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed #3b82f6;
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: 0.2s;
+            position: relative;
+            overflow: hidden;
+            min-height: 120px;
+        }
         .kyc-box:active { background: rgba(255,255,255,0.1); }
-        .sig-pad { width: 100%; height: 150px; background: #fff; border-radius: 10px; margin-bottom: 10px; border: 2px solid #ccc; touch-action: none; }
+        .kyc-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            background: rgba(0,0,0,0.8);
+        }
+        .kyc-box.uploaded img { display: block; }
+        .sig-pad-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .sig-pad {
+            width: 100%;
+            height: 180px;
+            background: #ffffff;
+            border-radius: 10px;
+            border: 2px solid #cbd5e1;
+            touch-action: none; /* ป้องกันไม่ให้หน้าจอเลื่อนตอนวาดนิ้ว */
+        }
+        .btn-clear-sig {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="theme-spirited">
 
     <div class="top-nav">
         <a href="evaluate.html" style="position: absolute; left: 20px; text-decoration: none; color: inherit; font-size: 20px;">←</a>
-        <div class="logo-c" style="font-size: 18px;">ยืนยันตัวตน (e-KYC)</div>
+        <div class="logo-c" style="font-size: 18px;">ทำสัญญาซื้อขาย (e-KYC)</div>
     </div>
 
     <div class="container">
         <div class="glass-card-light">
-            <h3 style="font-size: 15px; margin-bottom: 15px; color: #fff;">1. อัปโหลดบัตรประชาชน</h3>
-            <div class="kyc-box" onclick="alert('จำลองการเปิดกล้องถ่ายบัตรประชาชน')">
-                <div style="font-size: 40px; margin-bottom: 10px;">🪪</div>
-                <p style="font-size: 12px; color: var(--accent-blue);">แตะเพื่อถ่ายรูปหน้าบัตรประชาชน</p>
-                <p style="font-size: 10px; color: var(--text-muted); margin-top: 5px;">(ระบบจะใส่ลายน้ำให้โดยอัตโนมัติ)</p>
+            <h3 style="font-size: 15px; margin-bottom: 15px; color: #fff;">1. ถ่ายรูปบัตรประชาชน</h3>
+            <div class="kyc-box" id="idCardBox" onclick="openCamera()">
+                <div style="font-size: 40px; margin-bottom: 10px; position: relative; z-index: 2;">🪪</div>
+                <p style="font-size: 12px; color: #60a5fa; position: relative; z-index: 2;" id="uploadText">แตะเพื่อเปิดกล้อง</p>
+                <p style="font-size: 10px; color: #94a3b8; margin-top: 5px; position: relative; z-index: 2;">(เพื่อใช้ประกอบสัญญาซื้อขายเท่านั้น)</p>
+                <img id="idCardImg" src="" alt="ID Card">
             </div>
 
             <h3 style="font-size: 15px; margin-bottom: 10px; color: #fff;">2. ลายเซ็นอิเล็กทรอนิกส์</h3>
-            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">
-                ข้าพเจ้าขอยืนยันว่าอุปกรณ์นี้เป็นกรรมสิทธิ์ของข้าพเจ้าโดยชอบธรรม และได้อ่าน <a href="terms.html" style="color: var(--accent-blue);">เงื่อนไขการขาย</a> เรียบร้อยแล้ว
+            <p style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px; line-height: 1.4;">
+                ข้าพเจ้าขอยืนยันว่าอุปกรณ์นี้เป็นกรรมสิทธิ์ของข้าพเจ้าโดยชอบธรรม และได้อ่านเงื่อนไขการขายเรียบร้อยแล้ว
             </p>
-            <div style="position: relative;">
-    <canvas id="sigCanvas" class="sig-pad" width="400" height="150" style="touch-action: none; background: #fff;"></canvas>
-    <button onclick="clearSignature()" style="position: absolute; top: 10px; right: 10px; font-size: 10px; padding: 4px 8px; border-radius: 5px; border: 1px solid #ccc; background: #f8f9fa;">ล้างลายเซ็น</button>
-</div>
 
-<script>
-    const canvas = document.getElementById('sigCanvas');
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false;
+            <div class="sig-pad-container">
+                <canvas id="sigCanvas" class="sig-pad"></canvas>
+                <button class="btn-clear-sig" onclick="clearSignature()">🗑️ ล้างลายเซ็น</button>
+            </div>
 
-    // ปรับขนาด Canvas ให้พอดีกับหน้าจอ
-    function resizeCanvas() {
-        canvas.width = canvas.parentElement.clientWidth;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    // ตั้งค่าเส้นปากกา
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#0f172a';
-
-    // ฟังก์ชันเริ่มวาด
-    function startDrawing(e) {
-        isDrawing = true;
-        draw(e);
-    }
-
-    // ฟังก์ชันหยุดวาด
-    function stopDrawing() {
-        isDrawing = false;
-        ctx.beginPath();
-    }
-
-    // ฟังก์ชันวาดเส้น
-    function draw(e) {
-        if (!isDrawing) return;
-        e.preventDefault();
-
-        // รองรับทั้งเมาส์และนิ้วทัชสกรีน
-        let clientX = e.clientX || e.touches[0].clientX;
-        let clientY = e.clientY || e.touches[0].clientY;
-
-        let rect = canvas.getBoundingClientRect();
-        let x = clientX - rect.left;
-        let y = clientY - rect.top;
-
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-
-    // ล้างลายเซ็น
-    function clearSignature() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
-    }
-
-    // ผูก Event Listeners
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('mouseout', stopDrawing);
-
-    canvas.addEventListener('touchstart', startDrawing, {passive: false});
-    canvas.addEventListener('touchmove', draw, {passive: false});
-    canvas.addEventListener('touchend', stopDrawing);
-</script>
-    </div>
-
-    <!-- เมนูด้านล่าง 6 เมนู -->
-    <div class="bottom-nav">
-        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>หน้าแรก</a>
-        <a href="marketplace.html" class="nav-item"><span class="nav-icon">🛒</span>ซื้อ</a>
-        <a href="evaluate.html" class="nav-item active"><span class="nav-icon">🤝</span>ขาย</a>
-        <a href="trade-in.html" class="nav-item"><span class="nav-icon">🔄</span>เทิร์น</a>
-        <a href="tracking.html" class="nav-item"><span class="nav-icon">📍</span>สถานะ</a>
-        <a href="soldout.html" class="nav-item"><span class="nav-icon">🏆</span>เครดิต</a>
+            <button class="btn-glow-blue" style="width: 100%; margin-top: 15px; background: linear-gradient(90deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16,185,129,0.4);" onclick="submitKyc()" id="btnSubmit">✅ ยืนยันข้อมูลและส่งให้แอดมิน</button>
+        </div>
     </div>
 
     <script src="js/app.js"></script>
     <script>
+        // ==========================================
+        // ระบบ 1: กล้องถ่ายรูปบัตรประชาชน
+        // ==========================================
+        const cameraInput = document.createElement('input');
+        cameraInput.type = 'file';
+        cameraInput.accept = 'image/*';
+        cameraInput.capture = 'environment';
+        let isIdUploaded = false;
+
+        function openCamera() {
+            cameraInput.click();
+        }
+
+        cameraInput.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('uploadText').innerText = "กำลังประมวลผล...";
+
+            try {
+                // สมมติว่ามี ImageOptimizer ใน app.js (ถ้าไม่มีใช้ FileReader แทนได้)
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imgEl = document.getElementById('idCardImg');
+                    imgEl.src = event.target.result;
+                    document.getElementById('idCardBox').classList.add('uploaded');
+                    document.getElementById('uploadText').innerText = "ถ่ายแล้ว (แตะเพื่อถ่ายใหม่)";
+                    isIdUploaded = true;
+                };
+                reader.readAsDataURL(file);
+            } catch (err) {
+                alert("⚠️ เกิดข้อผิดพลาดในการโหลดรูป");
+            }
+            cameraInput.value = '';
+        });
+
+        // ==========================================
+        // ระบบ 2: วาดลายเซ็น (Canvas Signature Pad)
+        // ==========================================
+        const canvas = document.getElementById('sigCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let hasSignature = false;
+
+        // ปรับขนาด Canvas ให้พอดีกับกรอบ
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            ctx.scale(ratio, ratio);
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#0f172a';
+        }
+        window.addEventListener('resize', resizeCanvas);
+        // ดีเลย์นิดหน่อยเพื่อให้ CSS โหลดเสร็จก่อน
+        setTimeout(resizeCanvas, 100);
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            hasSignature = true;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            e.preventDefault();
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            e.preventDefault();
+        }
+
+        function stopDrawing() {
+            if (isDrawing) {
+                ctx.closePath();
+                isDrawing = false;
+            }
+        }
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hasSignature = false;
+        }
+
+        // Mouse Events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        // Touch Events สำหรับมือถือ
+        canvas.addEventListener('touchstart', startDrawing, {passive: false});
+        canvas.addEventListener('touchmove', draw, {passive: false});
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchcancel', stopDrawing);
+
+        // ==========================================
+        // ระบบ 3: ตรวจสอบและส่งข้อมูล
+        // ==========================================
         function submitKyc() {
+            if (!isIdUploaded) {
+                alert('⚠️ กรุณาถ่ายรูปบัตรประชาชนก่อนครับ');
+                return;
+            }
+            if (!hasSignature) {
+                alert('⚠️ กรุณาเซ็นชื่อรับรองด้วยครับ');
+                return;
+            }
+
+            // ในของจริง เราจะดึงข้อมูลภาพเพื่อส่งไป Backend แบบนี้:
+            // const idCardBase64 = document.getElementById('idCardImg').src;
+            // const signatureBase64 = canvas.toDataURL("image/png");
+
             ActionLock.lock('btnSubmit', 'กำลังเข้ารหัสข้อมูล...');
             setTimeout(() => {
-                alert('🎉 ข้อมูลถูกส่งไปที่ Telegram ของแอดมินเรียบร้อยแล้ว แอดมินจะติดต่อกลับเพื่อนัดหมายรับเครื่องครับ!');
+                alert('🎉 สัญญาเสร็จสมบูรณ์! ข้อมูลถูกส่งไปที่ Telegram ของแอดมินเรียบร้อยแล้ว แอดมินจะติดต่อกลับเพื่อนัดหมายรับเครื่องครับ!');
 
-                // บันทึกสถานะว่าเพิ่งทำรายการขาย
+                // บันทึกสถานะเพื่อใช้ในหน้าติดตามสถานะ
                 AppState.set('last_tx', 'sell');
-
                 window.location.href = 'tracking.html';
             }, 1500);
         }
