@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>ClearMobi | ตลาดมือถือ</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
@@ -14,23 +12,24 @@
         .filter-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--glass-border); padding: 8px 18px; border-radius: 20px; font-size: 12px; cursor: pointer; flex-shrink: 0;}
         .filter-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); font-weight: bold; }
 
-        /* List View (คอลัมน์เดียว) */
         .product-list { display: flex; flex-direction: column; gap: 15px; }
         .product-card {
             display: flex; flex-direction: row; align-items: center; gap: 15px;
-            padding: 15px; cursor: pointer; background: var(--glass-dark);
+            padding: 15px; background: var(--glass-dark);
             border-radius: 20px; border: 1px solid var(--glass-border);
+            animation: fadeIn 0.3s ease-in-out;
         }
-        .prod-img-wrapper { width: 90px; height: 90px; flex-shrink: 0; background: rgba(255,255,255,0.05); border-radius: 15px; display: flex; justify-content: center; align-items: center; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .prod-img-wrapper { width: 90px; height: 90px; flex-shrink: 0; background: rgba(255,255,255,0.05); border-radius: 15px; display: flex; justify-content: center; align-items: center; cursor: pointer;}
         .prod-img { width: 80%; height: 80%; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); transition: transform 0.3s; }
-        .product-card:active .prod-img { transform: scale(1.1); }
+        .prod-img-wrapper:active .prod-img { transform: scale(1.1); }
 
         .prod-info { flex: 1; text-align: left; display: flex; flex-direction: column; justify-content: center; }
         .prod-title { font-size: 15px; color: #fff; font-weight: bold; margin-bottom: 2px; line-height: 1.2; }
         .prod-cond { font-size: 11px; color: var(--accent-green); margin-bottom: 5px; }
         .prod-price { font-size: 18px; font-weight: bold; color: #60a5fa; margin-bottom: 8px; }
-
-        .btn-buy-sm { background: linear-gradient(90deg, #1e3a8a, #3b82f6); border: none; color: white; padding: 8px 20px; border-radius: 12px; font-weight: bold; font-size: 12px; align-self: flex-start;}
+        .btn-buy-sm { background: linear-gradient(90deg, #1e3a8a, #3b82f6); border: none; color: white; padding: 8px 20px; border-radius: 12px; font-weight: bold; font-size: 12px; align-self: flex-start; cursor: pointer;}
     </style>
 </head>
 <body class="theme-spirited">
@@ -41,46 +40,15 @@
     </div>
 
     <div class="container">
-        <div class="filter-bar">
-            <div class="filter-btn active">🌟 ทั้งหมด</div>
-            <div class="filter-btn">🍎 iPhone</div>
-            <div class="filter-btn">🤖 Galaxy</div>
-            <div class="filter-btn">✨ เกรดนางฟ้า</div>
+        <div class="filter-bar" id="filterBar">
+            <div class="filter-btn active" onclick="renderProducts('all')">🌟 ทั้งหมด</div>
+            <div class="filter-btn" onclick="renderProducts('apple')">🍎 iPhone</div>
+            <div class="filter-btn" onclick="renderProducts('samsung')">🤖 Galaxy</div>
+            <div class="filter-btn" onclick="renderProducts('gradeS')">✨ เกรดนางฟ้า</div>
         </div>
 
         <div class="product-list" id="productGrid">
-
-            <div class="product-card">
-                <div class="prod-img-wrapper" onclick="window.location.href='product.html'"><img src="images/phone1.webp" class="prod-img" alt="Product"></div>
-                <div class="prod-info">
-                    <div class="prod-title">iPhone 13 Pro Max</div>
-                    <div class="prod-cond">✨ เกรด S (100%)</div>
-                    <div class="prod-price">฿23,000</div>
-                    <button class="btn-buy-sm" id="prod1BuyBtn" onclick="ActionLock.lock(this.id, 'จอง...'); setTimeout(()=>alert('🎉 จองสินค้าสำเร็จ แอดมินทัก Telegram แล้วครับ'), 800);">🛍️ สั่งซื้อ</button>
-                </div>
             </div>
-
-            <div class="product-card">
-                <div class="prod-img-wrapper" onclick="window.location.href='product.html'"><img src="images/phone2.webp" class="prod-img" alt="Product"></div>
-                <div class="prod-info">
-                    <div class="prod-title">Galaxy S23 Ultra</div>
-                    <div class="prod-cond">✅ เกรด A (95%+)</div>
-                    <div class="prod-price">฿28,000</div>
-                    <button class="btn-buy-sm" id="prod2BuyBtn" onclick="ActionLock.lock(this.id, 'จอง...'); setTimeout(()=>alert('🎉 จองสินค้าสำเร็จ แอดมินทัก Telegram แล้วครับ'), 800);">🛍️ สั่งซื้อ</button>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="prod-img-wrapper" onclick="window.location.href='product.html'"><img src="images/phone-14-blue.webp" class="prod-img" alt="Product"></div>
-                <div class="prod-info">
-                    <div class="prod-title">iPhone 14 (128GB)</div>
-                    <div class="prod-cond">✅ เกรด A (95%+)</div>
-                    <div class="prod-price">฿18,500</div>
-                    <button class="btn-buy-sm" id="prod3BuyBtn" onclick="ActionLock.lock(this.id, 'จอง...'); setTimeout(()=>alert('🎉 จองสินค้าสำเร็จ แอดมินทัก Telegram แล้วครับ'), 800);">🛍️ สั่งซื้อ</button>
-                </div>
-            </div>
-
-        </div>
     </div>
 
     <div class="bottom-nav">
@@ -93,5 +61,72 @@
     </div>
 
     <script src="js/app.js"></script>
+    <script>
+        // 1. จำลองฐานข้อมูลสินค้าเป็น JSON (พร้อมต่อ API ของจริง)
+        const mockDatabase = [
+            { id: 1, brand: "apple", name: "iPhone 13 Pro Max", cond: "✨ เกรด S (100%)", price: 23000, img: "images/phone1.webp" },
+            { id: 2, brand: "samsung", name: "Galaxy S23 Ultra", cond: "✅ เกรด A (95%+)", price: 28000, img: "images/phone2.webp" },
+            { id: 3, brand: "apple", name: "iPhone 14 (128GB)", cond: "✅ เกรด A (95%+)", price: 18500, img: "images/phone-14-blue.webp" },
+            { id: 4, brand: "apple", name: "iPhone 14 Pro", cond: "✨ เกรด S (100%)", price: 29900, img: "images/product-iphone14-hero.webp" }
+        ];
+
+        // 2. ฟังก์ชันวาดหน้าจอ (Render)
+        function renderProducts(filterStr) {
+            // จัดการสีปุ่ม Filter ให้เป็น Active
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = ''; // ล้างข้อมูลเก่าทิ้งก่อน
+
+            // กรองข้อมูลตามที่เลือก
+            const filteredProducts = mockDatabase.filter(product => {
+                if (filterStr === 'all') return true;
+                if (filterStr === 'gradeS') return product.cond.includes('เกรด S');
+                return product.brand === filterStr;
+            });
+
+            // ถ้าไม่มีสินค้า
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = `<p style="text-align: center; color: var(--text-muted); margin-top: 20px;">ไม่มีสินค้าในหมวดหมู่นี้</p>`;
+                return;
+            }
+
+            // วนลูปสร้าง HTML ของสินค้าแต่ละชิ้น
+            filteredProducts.forEach(product => {
+                const html = `
+                <div class="product-card">
+                    <div class="prod-img-wrapper" onclick="window.location.href='product.html'">
+                        <img src="${product.img}" class="prod-img" alt="${product.name}">
+                    </div>
+                    <div class="prod-info">
+                        <div class="prod-title">${product.name}</div>
+                        <div class="prod-cond">${product.cond}</div>
+                        <div class="prod-price">฿${product.price.toLocaleString()}</div>
+                        <button class="btn-buy-sm" id="buyBtn_${product.id}" onclick="processPurchase(${product.id})">🛍️ สั่งซื้อ</button>
+                    </div>
+                </div>`;
+                grid.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        // 3. ฟังก์ชันสั่งซื้อ (ที่จะตรวจสอบการ Login ก่อน)
+        function processPurchase(productId) {
+            // เรียก requireLogin จาก app.js (ถ้ายืนยันตัวตนผ่าน ถึงจะรันโค้ดด้านใน)
+            requireLogin(() => {
+                ActionLock.lock(`buyBtn_${productId}`, 'จอง...');
+                setTimeout(() => {
+                    alert('🎉 จองสินค้าสำเร็จ แอดมินรับทราบคำสั่งซื้อเรียบร้อยครับ (ระบบทดสอบ)');
+                    ActionLock.unlock(`buyBtn_${productId}`);
+                }, 1000);
+            });
+        }
+
+        // 4. โหลดสินค้าทั้งหมดตอนเปิดหน้าเว็บครั้งแรก
+        window.onload = () => {
+            // จำลองการคลิกปุ่ม "ทั้งหมด"
+            document.querySelector('.filter-btn').click();
+        };
+    </script>
 </body>
 </html>

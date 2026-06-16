@@ -105,30 +105,87 @@ window.closeDocument = function() {
     if(modal) modal.classList.remove('show');
 };
 
-// --- 7. ระบบ Smart Auth & Device Fingerprint (เตรียมไว้คุยกับ Backend) ---
-async function generateDeviceFingerprint() {
-    const screenRes = `${window.screen.width}x${window.screen.height}`;
-    const colorDepth = window.screen.colorDepth;
-    const userAgent = navigator.userAgent;
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const language = navigator.language;
-    const rawData = `${screenRes}-${colorDepth}-${userAgent}-${timezone}-${language}`;
-
-    const msgBuffer = new TextEncoder().encode(rawData);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-window.requireLogin = async function(nextActionFunction) {
-    const userPhone = localStorage.getItem('cm_user_phone');
+// --- 7. ระบบ Smart Auth & OTP Modal (อัปเกรดใหม่) ---
+window.requireLogin = function(nextActionFunction) {
+    const userPhone = AppState.get('user_phone');
     if (userPhone) {
-        console.log("Welcome back:", userPhone);
-        nextActionFunction();
+        console.log("ผู้ใช้ล็อกอินแล้ว:", userPhone);
+        nextActionFunction(); // ถ้ามีเบอร์แล้ว ให้ทำรายการต่อได้เลย
     } else {
-        const deviceId = await generateDeviceFingerprint();
-        console.log("No Session. Device ID for anti-bot:", deviceId);
-        // TODO: เด้ง Modal ให้กรอกเบอร์โทรศัพท์และส่ง OTP
-        alert("🔒 กรุณายืนยันเบอร์โทรศัพท์ก่อนทำรายการ (จำลอง)");
+        showLoginModal(nextActionFunction); // ถ้ายังไม่มีเบอร์ ให้แสดง Popup OTP
     }
 };
+
+function showLoginModal(nextAction) {
+    // 1. ตรวจสอบว่าเคยสร้าง Modal ไว้หรือยัง ถ้ายังให้สร้างใหม่แทรกเข้าไปใน HTML
+    if (!document.getElementById('authModal')) {
+        const modalHtml = `
+        <div id="authModal" class="modal" style="z-index: 3000;">
+        <div class="glass-card-light" style="width: 90%; max-width: 400px; text-align: center; position: relative;">
+        <div class="modal-close" onclick="closeAuthModal()" style="top: 10px; right: 15px; font-size: 30px;">&times;</div>
+        <div style="font-size: 40px; margin-bottom: 10px;">🔐</div>
+        <h3 style="color: #fff; margin-bottom: 10px; font-size: 18px;">เข้าสู่ระบบ</h3>
+        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 20px;">กรุณายืนยันเบอร์โทรศัพท์เพื่อทำรายการต่อ</p>
+
+        <div id="phoneStep">
+        <input type="tel" id="loginPhone" class="search-box" placeholder="เบอร์โทรศัพท์ 10 หลัก" maxlength="10" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3);">
+        <button class="btn-glow-blue" id="btnReqOtp" onclick="requestOtp()">📩 ขอรับรหัส OTP</button>
+        </div>
+
+        <div id="otpStep" style="display: none; margin-top: 15px;">
+        <p style="font-size: 11px; color: var(--accent-green); margin-bottom: 10px;">ส่งรหัสไปที่เบอร์ของคุณแล้ว</p>
+        <input type="number" id="loginOtp" class="search-box" placeholder="รหัส OTP 6 หลัก" maxlength="6" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); letter-spacing: 5px;">
+        <button class="btn-glow-green" id="btnConfirmOtp" onclick="confirmOtp()">✅ ยืนยัน OTP</button>
+        </div>
+        </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    // 2. แสดง Modal และเก็บฟังก์ชันที่รอทำงานไว้
+    document.getElementById('authModal').classList.add('show');
+    document.getElementById('phoneStep').style.display = 'block';
+    document.getElementById('otpStep').style.display = 'none';
+    window.pendingAuthAction = nextAction;
+}
+
+function closeAuthModal() {
+    document.getElementById('authModal').classList.remove('show');
+}
+
+function requestOtp() {
+    const phone = document.getElementById('loginPhone').value;
+    if (phone.length < 10) {
+        alert("⚠️ กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก");
+        return;
+    }
+    ActionLock.lock('btnReqOtp', 'กำลังส่ง OTP...');
+    setTimeout(() => {
+        ActionLock.unlock('btnReqOtp');
+        document.getElementById('phoneStep').style.display = 'none';
+        document.getElementById('otpStep').style.display = 'block';
+    }, 1000); // จำลองการดีเลย์ 1 วินาที
+}
+
+function confirmOtp() {
+    const otp = document.getElementById('loginOtp').value;
+    if (otp.length < 6) {
+        alert("⚠️ กรุณากรอก OTP ให้ครบ 6 หลัก");
+        return;
+    }
+    ActionLock.lock('btnConfirmOtp', 'ตรวจสอบรหัส...');
+    setTimeout(() => {
+        ActionLock.unlock('btnConfirmOtp');
+        const phone = document.getElementById('loginPhone').value;
+
+        // บันทึกการเข้าระบบลง LocalStorage
+        AppState.set('user_phone', phone);
+        alert("🎉 เข้าสู่ระบบสำเร็จ!");
+        closeAuthModal();
+
+        // รันคำสั่งที่โดนดักไว้ต่อได้เลย!
+        if (typeof window.pendingAuthAction === 'function') {
+            window.pendingAuthAction();
+        }
+    }, 1000);
+}

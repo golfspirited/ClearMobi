@@ -20,6 +20,10 @@
         .role-view.show { display: block; animation: fadeInUp 0.5s ease; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* สไตล์ปุ่มลอยสำหรับโหมดนักพัฒนา */
+        .dev-hint { font-size: 10px; color: var(--text-muted); text-align: center; margin-top: 15px; line-height: 1.6;}
+        .dev-badge { background: rgba(0,0,0,0.1); padding: 2px 5px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); cursor: pointer;}
     </style>
 </head>
 <body class="theme-pastel">
@@ -31,17 +35,27 @@
 
     <div class="container">
         <div class="glass-card-light" id="searchSection">
-            <h3 style="text-align: center; color: #1e293b; margin-bottom: 15px;">สถานะการ ซื้อ/ขาย/เทิร์น</h3>
+            <h3 style="text-align: center; color: #1e293b; margin-bottom: 15px;">ติดตามการ ซื้อ/ขาย/เทิร์น</h3>
             <input type="tel" id="trackInput" class="search-box" placeholder="📱 เบอร์โทรศัพท์ 10 หลัก" maxlength="10">
-            <button class="btn-glow-blue" id="searchBtn">🔍 ค้นหาข้อมูล (OTP)</button>
+            <button class="btn-glow-blue" id="searchBtn">🔍 ตรวจสอบสถานะ</button>
+
+            <div class="dev-hint">
+                <b>💡 เบอร์สำหรับทดสอบ (คลิกเพื่อเติมออโต้):</b><br>
+                <span class="dev-badge" onclick="fillMockPhone('0811111111')">081-111-1111 (รอส่ง)</span>
+                <span class="dev-badge" onclick="fillMockPhone('0822222222')">082-222-2222 (ทำเควส)</span><br>
+                <span class="dev-badge" onclick="fillMockPhone('0833333333')">083-333-3333 (รับโล่)</span>
+                <span class="dev-badge" onclick="fillMockPhone('0844444444')">084-444-4444 (ขาย)</span>
+            </div>
         </div>
 
         <div class="glass-card-light role-view" id="statusView">
             <div style="background: #fff; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                <div style="font-size: 11px; color: #64748b;">เบอร์โทรศัพท์</div>
+                <div style="font-size: 11px; color: #64748b;">สถานะเบอร์โทรศัพท์</div>
                 <div style="font-size: 18px; font-weight: bold; color: var(--accent-blue);" id="userPhoneDisplay">-</div>
             </div>
             <div class="timeline" id="timelineContainer"></div>
+
+            <button class="btn-glow-blue" style="margin-top: 15px; background: linear-gradient(90deg, #94a3b8, #64748b);" onclick="location.reload()">🔄 ค้นหาเบอร์อื่น</button>
         </div>
     </div>
 
@@ -56,11 +70,31 @@
 
     <script src="js/app.js"></script>
     <script>
+        // ==========================================
+        // 1. ฐานข้อมูลจำลอง (Mock Database)
+        // ==========================================
+        const mockTrackingDB = {
+            "0811111111": { type: "buy", questStep: 0 },   // สถานะ: สั่งซื้อ รอรับของ
+            "0822222222": { type: "buy", questStep: 3 },   // สถานะ: รับของแล้ว ทำเควสถึงด่าน 3
+            "0833333333": { type: "buy", questStep: 7 },   // สถานะ: ทำเควสจบแล้ว รอรับโล่
+            "0844444444": { type: "sell", questStep: 0 },  // สถานะ: กำลังขายเครื่อง รอแอดมิน
+            "0855555555": { type: "trade", questStep: 0 }  // สถานะ: กำลังเทิร์นเครื่อง รอแอดมิน
+        };
+
+        // ฟังก์ชันช่วยกรอกเบอร์อัตโนมัติสำหรับเทส
+        function fillMockPhone(phone) {
+            document.getElementById('trackInput').value = phone;
+        }
+
+        // ==========================================
+        // 2. ระบบค้นหาและแสดงผล
+        // ==========================================
         document.getElementById('searchBtn').addEventListener('click', function() {
             const phone = document.getElementById('trackInput').value;
             if(phone.length < 10) { alert('กรุณากรอกเบอร์โทรศัพท์ 10 หลักครับ'); return; }
 
-            ActionLock.lock('searchBtn', 'เชื่อมต่อระบบ...');
+            ActionLock.lock('searchBtn', 'กำลังค้นหาข้อมูล...');
+
             setTimeout(() => {
                 ActionLock.unlock('searchBtn');
                 document.getElementById('searchSection').style.display = 'none';
@@ -68,21 +102,65 @@
                 document.getElementById('userPhoneDisplay').innerText = phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
 
                 const timeline = document.getElementById('timelineContainer');
-                const lastTx = AppState.get('last_tx');
-                const questStep = parseInt(AppState.get('quest_step') || '0');
 
-                if (lastTx === 'sell') {
-                    timeline.innerHTML = `<div class="timeline-item done"><div class="timeline-title">1. ทำสัญญา (KYC)</div><div class="timeline-desc">แอดมินรับทราบแล้ว</div></div><div class="timeline-item active"><div class="timeline-title">2. นัดรับเครื่อง</div><div class="timeline-desc">รอแอดมินติดต่อทาง Telegram</div></div>`;
-                } else if (lastTx === 'trade') {
-                    timeline.innerHTML = `<div class="timeline-item done"><div class="timeline-title">1. แจ้งเทิร์นเครื่อง</div><div class="timeline-desc">ระบบบันทึกส่วนต่างแล้ว</div></div><div class="timeline-item active"><div class="timeline-title">2. นัดหมายและทำสัญญา</div><div class="timeline-desc">รอแอดมินติดต่อทาง Telegram</div></div>`;
-                } else if (lastTx === 'buy' && questStep === 0) {
-                    timeline.innerHTML = `<div class="timeline-item done"><div class="timeline-title">1. ยืนยันคำสั่งซื้อ</div><div class="timeline-desc">แอดมินรับออเดอร์แล้ว</div></div><div class="timeline-item active"><div class="timeline-title">2. จัดส่งสินค้า</div><div class="timeline-desc">รอรับพัสดุและชำระเงินปลายทาง</div><button class="btn-glow-blue" style="margin-top: 8px; font-size: 11px; padding: 8px 12px; width: auto;" onclick="receiveItem()">📦 ได้รับเครื่องแล้ว (เริ่มภารกิจ)</button></div>`;
-                } else if (questStep > 0 && questStep < 7) {
-                    timeline.innerHTML = `<div class="timeline-item done"><div class="timeline-title">1. รับเครื่องสำเร็จ</div><div class="timeline-desc">เริ่มทำภารกิจแล้ว</div></div><div class="timeline-item active"><div class="timeline-title">2. ภารกิจ 28 วัน</div><div class="timeline-desc">ทำไปแล้ว ${questStep}/6 ด่าน</div><button class="btn-glow-blue" style="margin-top: 8px; font-size: 11px; padding: 6px 12px; width: auto;" onclick="window.location.href='quest.html'">🚀 ทำภารกิจต่อ</button></div>`;
-                } else if (questStep === 7) {
-                    timeline.innerHTML = `<div class="timeline-item done"><div class="timeline-title">1. ภารกิจ 28 วัน</div><div class="timeline-desc">สำเร็จครบ 6 ด่าน</div></div><div class="timeline-item done"><div class="timeline-title">2. ตรวจสอบสลิป</div><div class="timeline-desc">แอดมินตรวจสอบแล้ว</div></div><div class="timeline-item active"><div class="timeline-title">3. จัดส่งโล่รางวัล</div><div class="timeline-desc">ระบบกำลังส่งโล่เข้า Email 🛡️</div></div>`;
+                // ตรวจสอบว่าเบอร์อยู่ใน Mock DB หรือตรงกับเบอร์ที่ Login (LocalStorage)
+                let txType = null;
+                let qStep = 0;
+
+                if (mockTrackingDB[phone]) {
+                    // ดึงจาก Mock DB
+                    txType = mockTrackingDB[phone].type;
+                    qStep = mockTrackingDB[phone].questStep;
+                } else if (phone === AppState.get('user_phone')) {
+                    // ดึงจากประวัติการทำรายการล่าสุดของคนนั้น (LocalStorage)
+                    txType = AppState.get('last_tx');
+                    qStep = parseInt(AppState.get('quest_step') || '0');
+                }
+
+                // ==========================================
+                // 3. วาด UI (Timeline) ตามสถานะที่ได้มา
+                // ==========================================
+                if (txType === 'sell') {
+                    timeline.innerHTML = `
+                        <div class="timeline-item done"><div class="timeline-title">1. ทำสัญญา (e-KYC)</div><div class="timeline-desc">แอดมินรับทราบแล้ว</div></div>
+                        <div class="timeline-item active"><div class="timeline-title">2. นัดรับเครื่อง</div><div class="timeline-desc">รอแอดมินติดต่อทาง Telegram เพื่อโอนเงิน</div></div>`;
+
+                } else if (txType === 'trade') {
+                    timeline.innerHTML = `
+                        <div class="timeline-item done"><div class="timeline-title">1. แจ้งเทิร์นเครื่อง</div><div class="timeline-desc">ระบบบันทึกส่วนต่างแล้ว</div></div>
+                        <div class="timeline-item active"><div class="timeline-title">2. นัดหมายและทำสัญญา</div><div class="timeline-desc">รอแอดมินติดต่อทาง Telegram</div></div>`;
+
+                } else if (txType === 'buy' && qStep === 0) {
+                    timeline.innerHTML = `
+                        <div class="timeline-item done"><div class="timeline-title">1. ยืนยันคำสั่งซื้อ</div><div class="timeline-desc">แอดมินรับออเดอร์แล้ว</div></div>
+                        <div class="timeline-item active">
+                            <div class="timeline-title">2. จัดส่งสินค้า</div>
+                            <div class="timeline-desc">รอรับพัสดุและชำระเงินปลายทาง</div>
+                            <button class="btn-glow-blue" style="margin-top: 8px; font-size: 11px; padding: 8px 12px; width: auto;" onclick="receiveItem()">📦 ได้รับเครื่องแล้ว (เริ่มภารกิจ)</button>
+                        </div>`;
+
+                } else if (qStep > 0 && qStep < 7) {
+                    timeline.innerHTML = `
+                        <div class="timeline-item done"><div class="timeline-title">1. รับเครื่องสำเร็จ</div><div class="timeline-desc">เริ่มทำภารกิจแล้ว</div></div>
+                        <div class="timeline-item active">
+                            <div class="timeline-title">2. ภารกิจรับประกัน 28 วัน</div>
+                            <div class="timeline-desc">ทำไปแล้ว ${qStep}/6 ด่าน</div>
+                            <button class="btn-glow-blue" style="margin-top: 8px; font-size: 11px; padding: 6px 12px; width: auto;" onclick="window.location.href='quest.html'">🚀 ไปทำภารกิจต่อ</button>
+                        </div>`;
+
+                } else if (qStep === 7) {
+                    timeline.innerHTML = `
+                        <div class="timeline-item done"><div class="timeline-title">1. ภารกิจ 28 วัน</div><div class="timeline-desc">สำเร็จครบ 6 ด่าน</div></div>
+                        <div class="timeline-item done"><div class="timeline-title">2. ตรวจสอบสลิป 100 บ.</div><div class="timeline-desc">แอดมินตรวจสอบแล้ว</div></div>
+                        <div class="timeline-item active"><div class="timeline-title">3. จัดส่งโล่รางวัล 🛡️</div><div class="timeline-desc">ระบบกำลังส่งโล่เกียรติยศเข้า Email ครับ</div></div>`;
+
                 } else {
-                    timeline.innerHTML = `<div style="text-align: center; color: #64748b; padding: 10px;"><img src="images/goodduck.webp" style="width: 100px; margin-bottom: 10px;"><br>ไม่พบประวัติการทำรายการ<br><br><button class="btn-glow-green" onclick="window.location.href='index.html'">หน้าแรก</button></div>`;
+                    // หาไม่เจอทั้งใน Mock DB และ LocalStorage
+                    timeline.innerHTML = `
+                        <div style="text-align: center; color: #64748b; padding: 10px;">
+                            <div style="font-size: 40px; margin-bottom: 10px;">🦆</div>
+                            ไม่พบประวัติการทำรายการของเบอร์นี้<br>กรุณาตรวจสอบเบอร์อีกครั้งครับ
+                        </div>`;
                 }
             }, 1000);
         });
