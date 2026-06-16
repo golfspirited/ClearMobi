@@ -2,173 +2,156 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ประเมินราคามือถือ - ClearMobi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ClearMobi | ประเมินราคา</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        /* สไตล์แบบ Glassmorphism ตึงๆ */
-        body {
-            background: #0f172a;
-            color: white;
-            font-family: sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+        /* สไตล์กล่องอัปโหลดรูป */
+        .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .upload-box {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 20px 10px;
-            text-align: center;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-            min-height: 80px;
+            background: rgba(255,255,255,0.05); border: 1px dashed var(--glass-border);
+            border-radius: 10px; aspect-ratio: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted);
+            transition: background 0.2s; position: relative; overflow: hidden;
         }
-        .upload-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: none;
-        }
-        .upload-box.uploaded img {
-            display: block;
-        }
-        .upload-icon {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-        .upload-text {
-            font-size: 12px;
-            z-index: 2;
-            position: relative;
-        }
-        .btn-eval {
-            background: linear-gradient(90deg, #3b82f6, #2563eb);
-            border: none;
-            border-radius: 25px;
-            color: white;
-            padding: 15px 20px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        #priceResult {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(34, 197, 94, 0.2);
-            border-radius: 10px;
-            text-align: center;
+        .upload-box:active { background: rgba(255,255,255,0.1); }
+        .upload-box.uploaded { border: 1px solid var(--accent-green); }
+
+        /* สไตล์รูปภาพที่ถ่ายแล้วให้อยู่พอดีกล่อง */
+        .upload-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; display: none; }
+        .upload-box.uploaded img { display: block; }
+
+        /* ตัวอักษรและไอคอน */
+        .upload-icon { font-size: 20px; margin-bottom: 5px; position: relative; z-index: 2; }
+        .upload-text { font-size: 9px; text-align: center; line-height: 1.2; position: relative; z-index: 2; }
+        .upload-box.uploaded .upload-text { color: #fff; text-shadow: 0px 0px 5px rgba(0,0,0,0.8); }
+
+        /* ผลลัพธ์การประเมินราคา */
+        .price-result {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+            border: 1px solid var(--accent-green); border-radius: 15px; padding: 20px;
+            text-align: center; margin-top: 20px; display: none;
         }
     </style>
 </head>
-<body>
-    <h2 style="text-align: center;">ถ่ายรูปประเมินราคา</h2>
-    <p style="text-align: center; font-size: 14px; color: #cbd5e1;">กรุณาถ่ายรูปให้ครบทั้ง 9 มุม</p>
+<body class="theme-spirited">
 
-    <div class="grid-container" id="uploadGrid">
-        <!-- สร้างกล่อง 9 มุม -->
-        <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">📱</div><div class="upload-text">ถ่ายหน้าจอมืด</div><img src=""></div>
-        <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">📱</div><div class="upload-text">ถ่ายหลังเครื่อง</div><img src=""></div>
-        <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">📱</div><div class="upload-text">ซุมถ่ายเลนส์กล้อง</div><img src=""></div>
-        <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">📱</div><div class="upload-text">ถ่ายขอบซ้าย</div><img src=""></div>
-        <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">📱</div><div class="upload-text">ถ่ายขอบบน</div><img src=""></div>
-        <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">📱</div><div class="upload-text">ถ่ายขอบขวา</div><img src=""></div>
-        <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">📱</div><div class="upload-text">ถ่ายตูดชาร์จ</div><img src=""></div>
-        <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">📱</div><div class="upload-text">หน้าจอเกี่ยวกับ</div><img src=""></div>
-        <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">📱</div><div class="upload-text">เปอร์เซ็นแบตเตอร์รี่</div><img src=""></div>
+    <div class="top-nav">
+        <a href="index.html" style="position: absolute; left: 20px; text-decoration: none; color: inherit; font-size: 20px;">←</a>
+        <div class="logo-c" style="font-size: 18px;">AI ประเมินราคา</div>
     </div>
 
-    <button id="btnEval" class="btn-eval" onclick="evaluatePrice()">วิเคราะห์ราคา</button>
+    <div class="container">
+        <div class="glass-card-light" style="margin-bottom: 20px; text-align: center;">
+            <p style="font-size: 13px; margin-bottom: 10px; color: #fff;">📸 ถ่ายรูปรอบเครื่อง <span style="color:var(--accent-blue); font-weight:bold;">จำนวน 9 มุม</span></p>
 
-    <div id="priceResult">
-        <h3>ราคาประเมินเบื้องต้น</h3>
-        <h1 style="color: #4ade80;">5,000 บาท</h1>
-        <p style="font-size: 12px; color: #cbd5e1;">(ราคานี้อาจเปลี่ยนแปลงตามสภาพจริง)</p>
+            <div class="upload-grid" id="uploadGrid">
+                <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">📱</div><div class="upload-text">หน้าจอ</div><img src=""></div>
+                <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">🔙</div><div class="upload-text">หลังเครื่อง</div><img src=""></div>
+                <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">🔝</div><div class="upload-text">ขอบบน</div><img src=""></div>
+                <div class="upload-box" onclick="openCamera(this)"><div class="upload-icon">⬇️</div><div class="upload-text">ขอบล่าง</div><img src=""></div>
+                <div class="upload-box" onclick="openCamera(this)"><div class="upload-text">ขอบซ้าย</div><img src=""></div>
+                <div class="upload-box" onclick="openCamera(this)"><div class="upload-text">ขอบขวา</div><img src=""></div>
+                <div class="upload-box" onclick="openCamera(this)"><div class="upload-text">เลนส์กล้อง</div><img src=""></div>
+                <div class="upload-box" onclick="openCamera(this)"><div class="upload-text">จอเปิดขาว</div><img src=""></div>
+                <div class="upload-box" onclick="openCamera(this)"><div class="upload-text">จอเปิดดำ</div><img src=""></div>
+            </div>
+
+            <button class="btn-glow-blue" style="width: 100%;" onclick="evaluatePrice()" id="btnEval">🤖 ให้ AI ประเมินราคา</button>
+        </div>
+
+        <div class="price-result" id="priceResult">
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 5px;">ราคาประเมินคาดการณ์</p>
+            <h2 style="color: var(--accent-green); font-size: 28px; margin-bottom: 15px;">฿18,500</h2>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-glow-blue" style="flex: 1; font-size: 13px;" onclick="window.location.href='kyc_legal.html'">💰 ยืนยันขาย</button>
+                <button class="btn-glow-blue" style="flex: 1; font-size: 13px; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 4px 15px rgba(245,158,11,0.4);" onclick="window.location.href='trade-in.html'">🔄 นำไปเทิร์น</button>
+            </div>
+        </div>
     </div>
 
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>หน้าแรก</a>
+        <a href="marketplace.html" class="nav-item"><span class="nav-icon">🛒</span>ซื้อ</a>
+        <a href="evaluate.html" class="nav-item active"><span class="nav-icon">🤝</span>ขาย</a>
+        <a href="trade-in.html" class="nav-item"><span class="nav-icon">🔄</span>เทิร์น</a>
+        <a href="tracking.html" class="nav-item"><span class="nav-icon">📍</span>สถานะ</a>
+        <a href="soldout.html" class="nav-item"><span class="nav-icon">🏆</span>เครดิต</a>
+    </div>
+
+    <script src="js/app.js"></script>
     <script>
         let uploadCount = 0;
         let currentUploadBox = null;
 
-        // สร้าง Input แบบซ่อน เพื่อใช้เรียกกล้องหลัง
+        // 1. สร้าง Input แบบซ่อน เพื่อใช้เรียกกล้องหลัง
         const cameraInput = document.createElement('input');
         cameraInput.type = 'file';
         cameraInput.accept = 'image/*';
         cameraInput.capture = 'environment';
 
-        // ดักจับเมื่อผู้ใช้ถ่ายรูปเสร็จ
+        // 2. ดักจับเมื่อผู้ใช้ถ่ายรูปเสร็จ
         cameraInput.addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file || !currentUploadBox) return;
 
             const textEl = currentUploadBox.querySelector('.upload-text');
+            const iconEl = currentUploadBox.querySelector('.upload-icon');
             const originalText = textEl.innerText;
-            textEl.innerText = "กำลังประมวลผล...";
+            textEl.innerText = "กำลังโหลด...";
+            if(iconEl) iconEl.style.display = 'none';
 
             try {
-                // ใช้ FileReader แปลงรูปเพื่อนำมาพรีวิวบนหน้าจอ
-                const reader = new FileReader();
-                reader.onload = function(event) {
+                // ใช้ ImageOptimizer ถ้ามีใน app.js หรือใช้ FileReader พื้นฐาน
+                if(typeof ImageOptimizer !== 'undefined') {
+                    const compressedBase64 = await ImageOptimizer.compress(file, 0.7, 800);
                     const imgEl = currentUploadBox.querySelector('img');
-                    imgEl.src = event.target.result;
+                    imgEl.src = compressedBase64;
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const imgEl = currentUploadBox.querySelector('img');
+                        imgEl.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
 
-                    if (!currentUploadBox.classList.contains('uploaded')) {
-                        currentUploadBox.classList.add('uploaded');
-                    }
-                    textEl.innerText = "ถ่ายแล้ว";
-                    textEl.style.textShadow = "0px 0px 5px #000";
+                if (!currentUploadBox.classList.contains('uploaded')) {
+                    currentUploadBox.classList.add('uploaded');
+                }
+                textEl.innerText = "ถ่ายแล้ว";
 
-                    uploadCount = document.querySelectorAll('.upload-box.uploaded').length;
-                };
-                reader.readAsDataURL(file);
-
+                uploadCount = document.querySelectorAll('.upload-box.uploaded').length;
             } catch (err) {
                 console.error("Error:", err);
                 textEl.innerText = originalText;
+                if(iconEl) iconEl.style.display = 'block';
                 alert("⚠️ เกิดข้อผิดพลาดในการโหลดรูป");
             }
 
-            // ล้างค่าเพื่อให้เปิดกล้องใหม่ได้
             cameraInput.value = '';
             currentUploadBox = null;
         });
 
-        // ฟังก์ชันสั่งคลิก Input ซ่อน เพื่อเปิดกล้อง
+        // 3. ฟังก์ชันสั่งคลิก Input ซ่อน เพื่อเปิดกล้อง
         function openCamera(el) {
             currentUploadBox = el;
             cameraInput.click();
         }
 
-        // ฟังก์ชันกดปุ่มประเมินราคา
+        // 4. ฟังก์ชันกดปุ่มประเมินราคา
         function evaluatePrice() {
             if(uploadCount < 9) {
-                alert('⚠️ กรุณาอัปโหลดรูปภาพให้ครบ 9 มุมก่อนครับ (ตอนนี้มี ' + uploadCount + ' รูป)');
+                alert('⚠️ กรุณาถ่ายรูปให้ครบทั้ง 9 มุมก่อนครับ (ปัจจุบันได้ ' + uploadCount + ' มุม)');
                 return;
             }
-
-            const btn = document.getElementById('btnEval');
-            btn.innerText = 'AI กำลังวิเคราะห์...';
-            btn.disabled = true;
-
-            // จำลองเวลาโหลดข้อมูล
+            ActionLock.lock('btnEval', 'AI กำลังวิเคราะห์...');
             setTimeout(() => {
                 document.getElementById('priceResult').style.display = 'block';
                 window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                btn.innerText = 'วิเคราะห์ราคา';
-                btn.disabled = false;
-            }, 2000);
+                ActionLock.unlock('btnEval'); // เผื่ออยากกดซ้ำ
+            }, 1500);
         }
     </script>
 </body>
